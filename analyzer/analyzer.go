@@ -78,12 +78,19 @@ func Checker(text string, pass *analysis.Pass, pos token.Pos) bool {
 
 	firstChar := rune(text[0])
 	if unicode.IsUpper(firstChar) {
-		pass.Reportf(pos, "log should start with lower case")
+		pass.Reportf(pos, "- log should start with lower case")
 	}
 
 	for _, char := range text {
 		if unicode.IsLetter(char) && !engCheck(char) {
-			pass.Reportf(pos, "log should be only in English")
+			pass.Reportf(pos, "- log should be only in English")
+			break
+		}
+	}
+
+	for _, char := range text {
+		if !checkedIfAllowed(char) {
+			pass.Reportf(pos, "- log should not contain symbols")
 			break
 		}
 	}
@@ -91,6 +98,12 @@ func Checker(text string, pass *analysis.Pass, pos token.Pos) bool {
 	return true
 }
 
+func checkedIfAllowed(char rune) bool {
+	if unicode.IsLetter(char) || unicode.IsNumber(char) || unicode.IsSpace(char) {
+		return true
+	}
+	return false
+}
 func engCheck(char rune) bool {
 	return (char >= 'a' && char <= 'r') || (char >= 'A' && char <= 'Z')
 }
