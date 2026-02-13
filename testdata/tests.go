@@ -7,6 +7,7 @@ import (
 )
 
 func tests() {
+
 	log.Println("Bad log1")
 	slog.Info("Bad log2")
 

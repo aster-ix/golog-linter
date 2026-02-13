@@ -2,7 +2,6 @@ package analyzer
 
 import (
 	"go/ast"
-	"go/token"
 	"strconv"
 	"unicode"
 
@@ -24,24 +23,14 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			if !ok {
 				return true
 			}
-
 			if !isLog(expr) {
 				return true
 			}
-
-			arg := expr.Args[0]
-			basicLit, ok := arg.(*ast.BasicLit)
-			if !ok {
+			if len(expr.Args) == 0 {
 				return true
 			}
 
-			// text := basicLit.Value -- string - выводится с кавычками
-			text, err := strconv.Unquote(basicLit.Value)
-			if err != nil {
-				return true
-			}
-
-			Checker(text, pass, arg.Pos())
+			Checker(expr.Args[0], pass)
 			return true
 		})
 	}
@@ -74,28 +63,41 @@ func isLog(expr *ast.CallExpr) bool {
 	return false
 }
 
-func Checker(text string, pass *analysis.Pass, pos token.Pos) bool {
+// логика проверки по 4 правилам
+func Checker(arg ast.Expr, pass *analysis.Pass) {
+	// rule 4: лог не должен выводить переменные чтобы избежать утечки важных данных
+	// TODO : не проверяет другие правила, если тут есть ошибка
+	basicLit, ok := arg.(*ast.BasicLit)
+	if !ok {
+		pass.Reportf(arg.Pos(), "- log should not contain variables for safety")
+		return
+	}
 
+	text, err := strconv.Unquote(basicLit.Value)
+	if err != nil {
+		return
+	}
+
+	// rule 1: лог должен начинаться с маленькой буквы
 	firstChar := rune(text[0])
 	if unicode.IsUpper(firstChar) {
-		pass.Reportf(pos, "- log should start with lower case")
+		pass.Reportf(arg.Pos(), "- log should start with lower case")
 	}
-
+	// rule 2: лог должен быть только на английском языке
 	for _, char := range text {
 		if unicode.IsLetter(char) && !engCheck(char) {
-			pass.Reportf(pos, "- log should be only in English")
+			pass.Reportf(arg.Pos(), "- log should be only in English")
 			break
 		}
 	}
-
+	// rule 3: лог не должен содержать спец. символы
 	for _, char := range text {
 		if !checkedIfAllowed(char) {
-			pass.Reportf(pos, "- log should not contain symbols")
+			pass.Reportf(arg.Pos(), "- log should not contain symbols")
 			break
 		}
 	}
 
-	return true
 }
 
 func checkedIfAllowed(char rune) bool {
@@ -105,5 +107,5 @@ func checkedIfAllowed(char rune) bool {
 	return false
 }
 func engCheck(char rune) bool {
-	return (char >= 'a' && char <= 'r') || (char >= 'A' && char <= 'Z')
+	return (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z')
 }
