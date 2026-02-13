@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"strconv"
+	"unicode"
 
 	"golang.org/x/tools/go/analysis"
 )
@@ -16,6 +17,8 @@ var Analyzer = &analysis.Analyzer{
 
 func run(pass *analysis.Pass) (interface{}, error) {
 	for _, file := range pass.Files {
+
+		// TODO: удалить личные комменты потом
 		ast.Inspect(file, func(f ast.Node) bool {
 			expr, ok := f.(*ast.CallExpr)
 			if !ok {
@@ -38,8 +41,12 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				return true
 			}
 
-			fmt.Println(text)
-			// Checker(text)
+			if !Checker(text) {
+				fmt.Println("ошибка")
+			} else {
+				fmt.Println("нет ошибки")
+			}
+
 			return true
 		})
 	}
@@ -53,8 +60,7 @@ func isLog(expr *ast.CallExpr) bool {
 		return false
 	}
 
-	// funcPack := selectorExpr.Sel.Name -- имя пакета
-
+	funcName := selectorExpr.Sel.Name
 	funcPack, ok := selectorExpr.X.(*ast.Ident)
 	if !ok {
 		return false
@@ -64,20 +70,22 @@ func isLog(expr *ast.CallExpr) bool {
 	fmt.Println(pack)
 
 	if pack == "slog" || pack == "log" {
-		return true
+
+		//TODO:вот эту страшную проверку сделать через мап потом,если времени хватит
+		if funcName == "Println" || funcName == "Printf" || funcName == "Info" ||
+			funcName == "Error" || funcName == "Warn" || funcName == "Debug" {
+			return true
+		}
 	}
-	//TODO: проверку на конкретную функцию, тк там есть log.New() который по факту лог, но текст не выводит
 	return false
 }
 
 func Checker(text string) bool {
 
-	// проверка на большую букву
-	// letters := []rune(text)
-	// if len(letters)>0{
-	// 	firstChar := letters[0]
-	// 	if unicode.IsUpper(firstChar) || firstChar
-	// }
+	firstChar := rune(text[0])
+	if unicode.IsUpper(firstChar) {
+		return false
+	}
 
 	return true
 }

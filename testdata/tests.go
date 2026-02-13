@@ -10,5 +10,8 @@ func tests() {
 	log.Println("Bad log1")
 	slog.Info("Bad log2")
 
+	log.Println("good log1")
+	slog.Info("gooD log2")
+
 	fmt.Println("not log")
 }
