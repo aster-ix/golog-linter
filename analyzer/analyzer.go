@@ -18,7 +18,6 @@ var Analyzer = &analysis.Analyzer{
 func run(pass *analysis.Pass) (interface{}, error) {
 	for _, file := range pass.Files {
 
-		// TODO: удалить личные комменты потом
 		ast.Inspect(file, func(f ast.Node) bool {
 			expr, ok := f.(*ast.CallExpr)
 			if !ok {
