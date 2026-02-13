@@ -53,22 +53,28 @@ func isLog(expr *ast.CallExpr) bool {
 
 	pack := funcPack.Name
 
+	// log/slog
 	if pack == "slog" || pack == "log" {
-
-		//TODO:вот эту страшную проверку сделать через мап потом,если времени хватит
-		if funcName == "Println" || funcName == "Printf" || funcName == "Info" ||
-			funcName == "Error" || funcName == "Warn" || funcName == "Debug" {
-			return true
+		logMethods := map[string]bool{
+			"Println": true, "Printf": true, "Print": true,
+			"Info": true, "Error": true, "Warn": true, "Debug": true,
 		}
+		return logMethods[funcName]
 	}
-	return false
+
+	// zap
+	zapMethods := map[string]bool{
+		"Info": true, "Infow": true, "Infof": true,
+		"Error": true, "Errorw": true, "Errorf": true,
+		"Warn": true, "Warnw": true, "Warnf": true,
+		"Debug": true, "Debugw": true, "Debugf": true,
+	}
+	return zapMethods[funcName]
 }
 
 // логика проверки по 4 правилам
-// TODO: надо сделать чтобы выводило сразу все ошибки, мб через мапу, потому что если я буду реализоывывать автоисправление, то так будет удобнее
 func Checker(arg ast.Expr, pass *analysis.Pass) {
-	// rule 4: лог не должен выводить переменные чтобы избежать утечки важных данных
-	// TODO : не проверяет другие правила, если тут есть ошибка
+
 	basicLit, ok := arg.(*ast.BasicLit)
 	if !ok {
 		pass.Reportf(arg.Pos(), "log should not contain variables for safety")
@@ -82,11 +88,14 @@ func Checker(arg ast.Expr, pass *analysis.Pass) {
 
 	// rule 1: лог должен начинаться с маленькой буквы
 	trim := strings.TrimSpace(text)
-	firstChar := rune(trim[0])
-	if engCheck(firstChar) && unicode.IsUpper(firstChar) {
-		pass.Reportf(arg.Pos(), "log should start with lower case")
+	if len(trim) != 0 {
+		firstChar := rune(trim[0])
+		if engCheck(firstChar) && unicode.IsUpper(firstChar) {
+			pass.Reportf(arg.Pos(), "log should start with lower case")
 
+		}
 	}
+
 	// rule 2: лог должен быть только на английском языке
 	for _, char := range text {
 		if unicode.IsLetter(char) && !engCheck(char) {
