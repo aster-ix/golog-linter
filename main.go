@@ -1,5 +1,10 @@
-package main 
+package main
 
-func main(){
-	
+import (
+	"github.com/aster-ix/golog-linter/analyzer"
+	"golang.org/x/tools/go/analysis/singlechecker"
+)
+
+func main() {
+	singlechecker.Main(analyzer.Analyzer)
 }

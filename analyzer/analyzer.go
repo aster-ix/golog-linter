@@ -1,13 +1,15 @@
-package analizer 
+package analyzer
 
-import("golang.org/x/tools/go/analysis")
+import (
+	"golang.org/x/tools/go/analysis"
+)
 
 var Analyzer = &analysis.Analyzer{
-	Name: "golog-linter",
+	Name: "gologlinter",
 	Doc:  "linter for golang logs",
 	Run:  run,
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
-	
+	return nil, nil
 }
