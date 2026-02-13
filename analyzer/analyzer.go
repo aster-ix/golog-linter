@@ -3,6 +3,7 @@ package analyzer
 import (
 	"go/ast"
 	"strconv"
+	"strings"
 	"unicode"
 
 	"golang.org/x/tools/go/analysis"
@@ -69,7 +70,7 @@ func Checker(arg ast.Expr, pass *analysis.Pass) {
 	// TODO : не проверяет другие правила, если тут есть ошибка
 	basicLit, ok := arg.(*ast.BasicLit)
 	if !ok {
-		pass.Reportf(arg.Pos(), "- log should not contain variables for safety")
+		pass.Reportf(arg.Pos(), "log should not contain variables for safety")
 		return
 	}
 
@@ -79,21 +80,23 @@ func Checker(arg ast.Expr, pass *analysis.Pass) {
 	}
 
 	// rule 1: лог должен начинаться с маленькой буквы
-	firstChar := rune(text[0])
-	if unicode.IsUpper(firstChar) {
-		pass.Reportf(arg.Pos(), "- log should start with lower case")
+	trim := strings.TrimSpace(text)
+	firstChar := rune(trim[0])
+	if engCheck(firstChar) && unicode.IsUpper(firstChar) {
+		pass.Reportf(arg.Pos(), "log should start with lower case")
+
 	}
 	// rule 2: лог должен быть только на английском языке
 	for _, char := range text {
 		if unicode.IsLetter(char) && !engCheck(char) {
-			pass.Reportf(arg.Pos(), "- log should be only in English")
+			pass.Reportf(arg.Pos(), "log should be only in English")
 			break
 		}
 	}
 	// rule 3: лог не должен содержать спец. символы
 	for _, char := range text {
 		if !checkedIfAllowed(char) {
-			pass.Reportf(arg.Pos(), "- log should not contain symbols")
+			pass.Reportf(arg.Pos(), "log should not contain symbols")
 			break
 		}
 	}
@@ -104,6 +107,7 @@ func checkedIfAllowed(char rune) bool {
 	if unicode.IsLetter(char) || unicode.IsNumber(char) || unicode.IsSpace(char) {
 		return true
 	}
+
 	return false
 }
 func engCheck(char rune) bool {
