@@ -16,15 +16,38 @@ var Analyzer = &analysis.Analyzer{
 func run(pass *analysis.Pass) (interface{}, error) {
 	for _, file := range pass.Files {
 		ast.Inspect(file, func(f ast.Node) bool {
-			expr, err := f.(*ast.CallExpr)
-			if !err {
+			expr, ok := f.(*ast.CallExpr)
+			if !ok {
 				return true
 			}
 
-			fmt.Println(expr, " == expr")
+			testansw := isLog(expr)
+			fmt.Println(testansw, " = islog")
 			return true
 		})
 	}
 
 	return nil, nil
+}
+
+func isLog(expr *ast.CallExpr) bool {
+	selectorExpr, ok := expr.Fun.(*ast.SelectorExpr)
+	if !ok {
+		return false
+	}
+
+	// funcPack := selectorExpr.Sel.Name -- имя пакета
+
+	funcPack, ok := selectorExpr.X.(*ast.Ident)
+	if !ok {
+		return false
+	}
+
+	pack := funcPack.Name
+	fmt.Println(pack)
+
+	if pack == "slog" || pack == "log" {
+		return true
+	}
+	return false
 }
