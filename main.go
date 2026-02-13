@@ -5,8 +5,6 @@ import (
 	"golang.org/x/tools/go/analysis/singlechecker"
 )
 
-type AnalyzerPlugin struct{}
-
 func main() {
 	singlechecker.Main(analyzer.Analyzer)
 }
