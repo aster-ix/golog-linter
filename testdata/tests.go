@@ -13,5 +13,7 @@ func tests() {
 	log.Println("good log1")
 	slog.Info("gooD log2")
 
+	log.Println("Log in рussian")
+
 	fmt.Println("not log")
 }

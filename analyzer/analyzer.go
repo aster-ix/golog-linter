@@ -1,8 +1,8 @@
 package analyzer
 
 import (
-	"fmt"
 	"go/ast"
+	"go/token"
 	"strconv"
 	"unicode"
 
@@ -41,12 +41,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				return true
 			}
 
-			if !Checker(text) {
-				fmt.Println("ошибка")
-			} else {
-				fmt.Println("нет ошибки")
-			}
-
+			Checker(text, pass, arg.Pos())
 			return true
 		})
 	}
@@ -67,7 +62,6 @@ func isLog(expr *ast.CallExpr) bool {
 	}
 
 	pack := funcPack.Name
-	fmt.Println(pack)
 
 	if pack == "slog" || pack == "log" {
 
@@ -80,12 +74,23 @@ func isLog(expr *ast.CallExpr) bool {
 	return false
 }
 
-func Checker(text string) bool {
+func Checker(text string, pass *analysis.Pass, pos token.Pos) bool {
 
 	firstChar := rune(text[0])
 	if unicode.IsUpper(firstChar) {
-		return false
+		pass.Reportf(pos, "log should start with lower case")
+	}
+
+	for _, char := range text {
+		if unicode.IsLetter(char) && !engCheck(char) {
+			pass.Reportf(pos, "log should be only in English")
+			break
+		}
 	}
 
 	return true
+}
+
+func engCheck(char rune) bool {
+	return (char >= 'a' && char <= 'r') || (char >= 'A' && char <= 'Z')
 }
