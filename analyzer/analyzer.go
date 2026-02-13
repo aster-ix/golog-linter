@@ -34,7 +34,6 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			return true
 		})
 	}
-
 	return nil, nil
 }
 
