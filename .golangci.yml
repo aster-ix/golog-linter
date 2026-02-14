@@ -1,13 +1,15 @@
 version: "2"
 
 linters:
+  default: none
   enable:
     - gologlinter
+  
   settings:
     custom:
       gologlinter:
         type: "module"
-        description: Linter for golang logs
+        description: linter for golang logs
 
 run:
   timeout: 5m
