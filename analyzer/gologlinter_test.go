@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/aster-ix/golog-linter/analyzer"
+	gologlinter "github.com/aster-ix/golog-linter/analyzer"
 	"golang.org/x/tools/go/analysis/analysistest"
 )
 
@@ -14,5 +14,5 @@ func TestAnalyzer(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	analysistest.Run(t, testdata, analyzer.Analyzer, "tests.go")
+	analysistest.Run(t, testdata, gologlinter.Analyzer, "tests.go")
 }

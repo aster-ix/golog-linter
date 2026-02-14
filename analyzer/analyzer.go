@@ -10,7 +10,7 @@ import (
 )
 
 var Analyzer = &analysis.Analyzer{
-	Name: "gologlinter",
+	Name: "golog",
 	Doc:  "linter for golang logs",
 	Run:  run,
 }

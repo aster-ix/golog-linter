@@ -1,0 +1,8 @@
+version: v2.9.0
+name: gologlinter
+
+
+plugins:
+  - module: github.com/aster-ix/golog-linter
+    import: github.com/aster-ix/golog-linter
+    path: .

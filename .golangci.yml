@@ -1,0 +1,17 @@
+version: "2"
+
+linters:
+  enable:
+    - gologlinter
+  settings:
+    custom:
+      gologlinter:
+        type: "module"
+        description: Linter for golang logs
+
+run:
+  timeout: 5m
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
