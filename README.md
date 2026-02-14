@@ -50,6 +50,7 @@ cd golog-linter
 
 ```bash
 go mod tidy
+go mod tidy -C testdata
 ```
 
 ### 3. Соберите кастомный golangci-lint
@@ -98,26 +99,30 @@ golog-linter/
 ## Makefile команды
 
 ```bash
-# Показать все доступные команды
+# Показать список всех доступных команд
 make help
 
-# Собрать кастомный golangci-lint (основная команда)
+# Собрать кастомный golangci-lint с плагином (основная команда)
 make plugin
 
-# Собрать executable
+# Собрать standalone executable (gologlinter)
 make exec
 
-# Запустить тесты (через go test)
+# Запустить unit-тесты (go test ./analyzer)
 make test
 
-# Собрать и запустить на тестовых данных
+# Собрать плагин и запустить линтер на testdata
 make run
+
+# Запустить линтер напрямую на testdata
+make test_w_linter
 
 # Очистить артефакты сборки
 make clean
 
-# Собрать всё (по умолчанию = plugin)
+# Собрать (по умолчанию выполняется make plugin)
 make
+
 ```
 ## Автор
 
