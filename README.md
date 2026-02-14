@@ -95,50 +95,6 @@ golog-linter/
 └── README.md
 ```
 
-```##
-
-### GitHub Actions
-
-```yaml
-name: Lint
-on: [push, pull_request]
-
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-  
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.25.0'
-  
-      - name: Install golangci-lint
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
-          sh -s -- -b $(go env GOPATH)/bin v2.9.0
-  
-      - name: Build custom linter
-        run: |
-          cd linter
-          golangci-lint custom -v
-  
-      - name: Run linter
-        run: cd linter && ./gologlinter run
-```
-
-### GitLab CI
-
-```yaml
-lint:
-  image: golang:1.25.0
-  script:
-    - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.9.0
-    - cd linter && golangci-lint custom -v
-    - ./gologlinter run
-```
-
 ## Makefile команды
 
 ```bash
@@ -163,8 +119,6 @@ make clean
 # Собрать всё (по умолчанию = plugin)
 make
 ```
-
-
 ## Автор
 
 [@aster-ix](https://github.com/aster-ix)
