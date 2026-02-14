@@ -3,6 +3,9 @@
 all: plugin
 
 plugin: 
+	go mod tidy
+	go mod tidy -C testdata
+	
 	golangci-lint custom -v
 	echo "plugin built [+]"
 
@@ -12,22 +15,26 @@ exec:
 
 
 test:
-	go test ./analyzer -verbose
+	go test ./analyzer 
+
+test_w_linter:
+	./gologlinter run testdata/tests.go
+	echo "test finished [+]"
+
 
 clean:
 	rm -rf gologlinter gologlinter.exe
 	echo "cleaned [+]"
 
-run: plugin
-	cd testdata
-	../gologlinter run tests.go
-	cd ..
-	echo "test finished [+]"
+run: plugin test_w_linter
 
 help:
-	@echo "Makefile commands:"
-	@echo "  plugin  - build custom golangci-lint binary"
-	@echo "  exec    - build executable"
-	@echo "  test    - run tests in analyzer package"
-	@echo "  clean   - remove build files"
-	@echo "  run     - build plugin and run golangci-lint on testdata"
+	@echo "Make commands:"
+	@echo "  all            Build plugin (default target)"
+	@echo "  plugin         Run go mod tidy (root + testdata) and build custom golangci-lint binary"
+	@echo "  exec           Build standalone gologlinter executable"
+	@echo "  test           Run Go tests in ./analyzer package"
+	@echo "  test_w_linter  Run built gologlinter against testdata/tests.go"
+	@echo "  run            Build plugin and run linter on testdata"
+	@echo "  clean          Remove built binaries"
+

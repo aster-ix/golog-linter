@@ -50,6 +50,7 @@ cd golog-linter
 
 ```bash
 go mod tidy
+go mod tidy -C testdata
 ```
 
 ### 3. Соберите кастомный golangci-lint
@@ -95,73 +96,34 @@ golog-linter/
 └── README.md
 ```
 
-```##
-
-### GitHub Actions
-
-```yaml
-name: Lint
-on: [push, pull_request]
-
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-  
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.25.0'
-  
-      - name: Install golangci-lint
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
-          sh -s -- -b $(go env GOPATH)/bin v2.9.0
-  
-      - name: Build custom linter
-        run: |
-          cd linter
-          golangci-lint custom -v
-  
-      - name: Run linter
-        run: cd linter && ./gologlinter run
-```
-
-### GitLab CI
-
-```yaml
-lint:
-  image: golang:1.25.0
-  script:
-    - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.9.0
-    - cd linter && golangci-lint custom -v
-    - ./gologlinter run
-```
 
 ## Makefile команды
 
 ```bash
-# Показать все доступные команды
+# Показать список всех доступных команд
 make help
 
-# Собрать кастомный golangci-lint (основная команда)
+# Собрать кастомный golangci-lint с плагином (основная команда)
 make plugin
 
-# Собрать executable
+# Собрать standalone executable (gologlinter)
 make exec
 
-# Запустить тесты (через go test)
+# Запустить unit-тесты (go test ./analyzer)
 make test
 
-# Собрать и запустить на тестовых данных
+# Собрать плагин и запустить линтер на testdata
 make run
+
+# Запустить линтер напрямую на testdata
+make test_w_linter
 
 # Очистить артефакты сборки
 make clean
 
-# Собрать всё (по умолчанию = plugin)
+# Собрать (по умолчанию выполняется make plugin)
 make
+
 ```
 
 
